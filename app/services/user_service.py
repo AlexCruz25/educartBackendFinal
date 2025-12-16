@@ -34,7 +34,7 @@ class UserService:
             username=user_data.username,
             email=user_data.email,
             password=password_hash,
-            role="client"
+            role=user_data.role
         )
 
         created_user = self.repo.create(user) 

@@ -1,218 +1,227 @@
-# test_edu_cart_v2.0.http
+# EduCart API Requests
+# Usa este archivo con la extensión REST Client de VS Code para probar los endpoints.
+# Configura las variables de entorno básicas según tu entorno local.
 
-@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzY1MzMyMjE4fQ.2mDMcXjSNe3tD94hmktwVfsj0WnWnm-Pv--ZRRar3xk
 @base_url = http://127.0.0.1:8000
+@user_token = PON_AQUI_UN_TOKEN_DE_USUARIO
+@admin_token = PON_AQUI_UN_TOKEN_DE_ADMIN
 
---- 🩺 HEALTH CHECK ---
 ###
+# 🩺 Healthcheck (servicio vivo)
+GET {{base_url}}/health
+Accept: application/json
+
+###
+# 🏠 Root (mensaje de bienvenida)
 GET {{base_url}}/
 Accept: application/json
 
---- USERS (AUTH) ---
+############################################################
+# AUTH
+############################################################
 
-👤 Crear Usuario (Registro)
 ###
+# 👤 Registrar nuevo usuario
 POST {{base_url}}/auth/register
 Content-Type: application/json
 
 {
-    "name": "Matias Perales",
-    "username": "mati11",
-    "email": "mati11@test.com",
-    "password": "mi_clave_secreta"
+  "name": "Usuario Demo",
+  "username": "demo_user",
+  "email": "demo@example.com",
+  "password": "clave_segura",
+  "role": "admin"
 }
 
 ###
-
-🔐 Iniciar Sesión (Login)
-###
+# 🔐 Login (devuelve token JWT)
 POST {{base_url}}/auth/login
 Content-Type: application/json
 
 {
-    "username": "mati11",
-    "password": "mi_clave_secreta"
+  "username": "demo_user",
+  "password": "clave_segura"
 }
 
 ###
-
-🔍 Obtener información del usuario autenticado (Depende de un token válido)
-###
+# 🔍 Perfil del usuario autenticado
 GET {{base_url}}/auth/me
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{user_token}}
 Accept: application/json
 
-
-
-Editar información del usuario autenticado (Depende de un token válido)
 ###
+# ✏️ Actualizar perfil
 PATCH {{base_url}}/auth/me
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{user_token}}
 Content-Type: application/json
 
 {
-    "name": "Matias Morales",
-    "username": "mati11"
+  "name": "Usuario Demo Actualizado",
+  "username": "demo_user"
 }
 
-###
+############################################################
+# CATEGORIES
+############################################################
 
---- CATEGORIES (Admin Required) ---
-
-🏷️ Listar todas las categorías (Público)
 ###
-GET {{base_url}}/categories
+# 🏷️ Listar categorías
+GET {{base_url}}/categories/
 Accept: application/json
 
-➕ Crear una nueva categoría (Requiere Admin Token)
 ###
-POST {{base_url}}/categories
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-"name": "Libros de Texto",
-"description": "Bibliografía técnica y novelas académicas."
-}
-
-
---- PRODUCTS ---
-
-🛍️ Listar todos los productos (Público)
-###
-GET {{base_url}}/products?categories=Libros&price_min=50
+# 📄 Obtener categoría por ID
+GET {{base_url}}/categories/1
 Accept: application/json
 
-
-💰 Ordenar por Precio: Bajo a Alto (Ascendente)
 ###
-GET {{base_url}}/products/?sort_by=price&order=asc
+# ➕ Crear categoría (admin)
+POST {{base_url}}/categories/
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "name": "Libros",
+  "description": "Libros"
+}
+
+###
+# ✏️ Actualizar categoría (admin)
+PUT {{base_url}}/categories/1
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "name": "Papelería y accesorios",
+  "description": "Catálogo completo de útiles."
+}
+
+###
+# 🗑️ Eliminar categoría (admin)
+DELETE {{base_url}}/categories/1
+Authorization: Bearer {{admin_token}}
+
+############################################################
+# PRODUCTS
+############################################################
+
+###
+# 🛍️ Listar productos con filtros opcionales
+GET {{base_url}}/products/?categories=Papelería&price_min=10&price_max=200&sort_by=price&order=asc
 Accept: application/json
 
-
 ###
-🔍 Obtener un producto por ID (Público)
-###
-GET {{base_url}}/products/2
+# 🔍 Obtener producto por ID
+GET {{base_url}}/products/1
 Accept: application/json
 
-➕ Crear un nuevo producto (Requiere Admin Token)
 ###
-POST {{base_url}}/products
-Authorization: Bearer {{auth_token}}
+# ➕ Crear producto (admin)
+POST {{base_url}}/products/
+Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 
 {
-    "name": "Calculadora Científica X",
-    "description": "Calculadora con funciones avanzadas para ingeniería.",
-    "price": 49.99,
-    "rating": 5,
-    "category_id": 1, 
-    "image_url": "https://example.com/images/calc_x.jpg",
-    "sku": "CALC-001",
-    "stock_current": 50,
-    "stock_min": 10
+  "name": "Cuaderno A4",
+  "description": "Cuaderno con hojas rayadas de 100 páginas.",
+  "price": 5.99,
+  "rating": 4,
+  "category_id": 1,
+  "image_url": "https://example.com/cuaderno-a4.jpg",
+  "sku": "CUAD-A4",
+  "stock_current": 120,
+  "stock_min": 10
 }
 
 ###
-
-✏️ Actualizar Producto (Requiere Admin Token)  //! Arregalar este endpoint para que solo actualice el precio
-###
-PATCH  {{base_url}}/products/1
-Authorization: Bearer {{auth_token}}
+# ✏️ Actualizar producto (admin)
+PATCH {{base_url}}/products/1
+Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 
 {
-    "price": 55.00
+  "price": 6.49,
+  "stock_current": 100
 }
 
-
---- CART (Secure: Uses Auth Token) ---
-
-🛒 Obtener Carrito del Usuario Autenticado
 ###
-GET {{base_url}}/cart
-Authorization: Bearer {{auth_token}}
+# 🗑️ Eliminar producto (admin)
+DELETE {{base_url}}/products/1
+Authorization: Bearer {{admin_token}}
+
+############################################################
+# CART (requiere token de usuario)
+############################################################
+
+###
+# 🛒 Obtener carrito del usuario autenticado
+GET {{base_url}}/cart/
+Authorization: Bearer {{user_token}}
 Accept: application/json
 
-➕ Agregar ítem al carrito (Usando Token)
 ###
-POST {{base_url}}/cart
-Authorization: Bearer {{auth_token}}
+# ➕ Agregar producto al carrito
+POST {{base_url}}/cart/
+Authorization: Bearer {{user_token}}
 Content-Type: application/json
 
 {
-"product_id": 3,
-"quantity": 10
+  "product_id": 1,
+  "quantity": 2
 }
 
 ###
-
-✏️ Actualizar cantidad de ítem (Establecer a 5)
-###
-PUT {{base_url}}/cart
-Authorization: Bearer {{auth_token}}
+# 🔄 Actualizar cantidad de un producto
+PUT {{base_url}}/cart/
+Authorization: Bearer {{user_token}}
 Content-Type: application/json
 
 {
-"product_id": 1,
-"quantity": 5
+  "product_id": 1,
+  "quantity": 5
 }
 
 ###
-
-🗑️ Eliminar un ítem del carrito
-###
+# 🗑️ Eliminar un producto del carrito
 DELETE {{base_url}}/cart/items/1
-Authorization: Bearer {{auth_token}}
-Accept: application/json
+Authorization: Bearer {{user_token}}
 
-
-Eliminar todos los items del carrito
 ###
-DELETE {{base_url}}/cart
-Authorization: Bearer {{auth_token}}
-Accept: application/json
+# 🧹 Vaciar carrito
+DELETE {{base_url}}/cart/
+Authorization: Bearer {{user_token}}
 
+############################################################
+# ORDERS
+############################################################
 
---- ORDERS (Checkout Atómico) ---
-
-🆕 Crear una Orden (Checkout Final)
 ###
-POST {{base_url}}/orders
-Authorization: Bearer {{auth_token}}
+# 🆕 Crear una orden (checkout)
+POST {{base_url}}/orders/
+Authorization: Bearer {{user_token}}
 Content-Type: application/json
 
 {
-    "shipping_address": "Calle Falsa 123, Ciudad de la Educación",
-    "locality": "Mendoza"
+  "shipping_address": "Calle Falsa 123",
+  "locality": "Ciudad"
 }
 
 ###
-
-📜 Historial de Órdenes del Cliente
-###
+# 📜 Historial de órdenes del usuario
 GET {{base_url}}/orders/my-orders
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{user_token}}
 Accept: application/json
 
-
-
-
 ###
-
-📜 Todas las ordenes
-###
+# 📜 Todas las órdenes (admin)
 GET {{base_url}}/orders/admin/all
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
 Accept: application/json
 
-
-
-
-### 🚚 ADMIN: Marcar orden como Completada
+###
+# 🚚 Actualizar estado de una orden
 PATCH {{base_url}}/orders/1/status
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 
 {

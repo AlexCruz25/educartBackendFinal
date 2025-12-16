@@ -7,6 +7,14 @@ class UserCreate(BaseModel):
     name: str
     email: str
     password: str
+    role: str = "client"
+
+    @validator("role")
+    def role_must_be_valid(cls, v):
+        allowed_roles = {"client", "admin"}
+        if v not in allowed_roles:
+            raise ValueError(f"El rol debe ser uno de: {', '.join(sorted(allowed_roles))}.")
+        return v
 
     @validator("password")
     def password_not_hashed(cls, v):
