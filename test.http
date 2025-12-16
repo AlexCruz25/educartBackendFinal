@@ -1,0 +1,223 @@
+# test_edu_cart_v2.0.http
+
+@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzY1MzMyMjE4fQ.2mDMcXjSNe3tD94hmktwVfsj0WnWnm-Pv--ZRRar3xk
+@base_url = http://127.0.0.1:8000
+
+--- 🩺 HEALTH CHECK ---
+###
+GET {{base_url}}/
+Accept: application/json
+
+--- USERS (AUTH) ---
+
+👤 Crear Usuario (Registro)
+###
+POST {{base_url}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Matias Perales",
+    "username": "mati11",
+    "email": "mati11@test.com",
+    "password": "mi_clave_secreta"
+}
+
+###
+
+🔐 Iniciar Sesión (Login)
+###
+POST {{base_url}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "mati11",
+    "password": "mi_clave_secreta"
+}
+
+###
+
+🔍 Obtener información del usuario autenticado (Depende de un token válido)
+###
+GET {{base_url}}/auth/me
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+
+
+Editar información del usuario autenticado (Depende de un token válido)
+###
+PATCH {{base_url}}/auth/me
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Matias Morales",
+    "username": "mati11"
+}
+
+###
+
+--- CATEGORIES (Admin Required) ---
+
+🏷️ Listar todas las categorías (Público)
+###
+GET {{base_url}}/categories
+Accept: application/json
+
+➕ Crear una nueva categoría (Requiere Admin Token)
+###
+POST {{base_url}}/categories
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+"name": "Libros de Texto",
+"description": "Bibliografía técnica y novelas académicas."
+}
+
+
+--- PRODUCTS ---
+
+🛍️ Listar todos los productos (Público)
+###
+GET {{base_url}}/products?categories=Libros&price_min=50
+Accept: application/json
+
+
+💰 Ordenar por Precio: Bajo a Alto (Ascendente)
+###
+GET {{base_url}}/products/?sort_by=price&order=asc
+Accept: application/json
+
+
+###
+🔍 Obtener un producto por ID (Público)
+###
+GET {{base_url}}/products/2
+Accept: application/json
+
+➕ Crear un nuevo producto (Requiere Admin Token)
+###
+POST {{base_url}}/products
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Calculadora Científica X",
+    "description": "Calculadora con funciones avanzadas para ingeniería.",
+    "price": 49.99,
+    "rating": 5,
+    "category_id": 1, 
+    "image_url": "https://example.com/images/calc_x.jpg",
+    "sku": "CALC-001",
+    "stock_current": 50,
+    "stock_min": 10
+}
+
+###
+
+✏️ Actualizar Producto (Requiere Admin Token)  //! Arregalar este endpoint para que solo actualice el precio
+###
+PATCH  {{base_url}}/products/1
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "price": 55.00
+}
+
+
+--- CART (Secure: Uses Auth Token) ---
+
+🛒 Obtener Carrito del Usuario Autenticado
+###
+GET {{base_url}}/cart
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+➕ Agregar ítem al carrito (Usando Token)
+###
+POST {{base_url}}/cart
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+"product_id": 3,
+"quantity": 10
+}
+
+###
+
+✏️ Actualizar cantidad de ítem (Establecer a 5)
+###
+PUT {{base_url}}/cart
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+"product_id": 1,
+"quantity": 5
+}
+
+###
+
+🗑️ Eliminar un ítem del carrito
+###
+DELETE {{base_url}}/cart/items/1
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+
+Eliminar todos los items del carrito
+###
+DELETE {{base_url}}/cart
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+
+--- ORDERS (Checkout Atómico) ---
+
+🆕 Crear una Orden (Checkout Final)
+###
+POST {{base_url}}/orders
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "shipping_address": "Calle Falsa 123, Ciudad de la Educación",
+    "locality": "Mendoza"
+}
+
+###
+
+📜 Historial de Órdenes del Cliente
+###
+GET {{base_url}}/orders/my-orders
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+
+
+
+###
+
+📜 Todas las ordenes
+###
+GET {{base_url}}/orders/admin/all
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+
+
+
+### 🚚 ADMIN: Marcar orden como Completada
+PATCH {{base_url}}/orders/1/status
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "status": "Completed"
+}
+
+
+
