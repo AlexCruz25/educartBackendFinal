@@ -38,7 +38,6 @@ class OrderRepository:
         self.db.add(new_order)
         self.db.flush() # Importante para obtener el ID de la nueva orden antes del commit
         
-        # 2. Crear los ítems de la Orden
         order_items = [
             OrderItem(
                 order_id=new_order.id, 
@@ -50,9 +49,7 @@ class OrderRepository:
         ]
         self.db.add_all(order_items)
         
-        # 3. La transacción se asegura en el Service o en el Commit final.
-        # Si esto fuera un método del Service, llamaríamos a db.commit()
-        # Si no lo hacemos aquí, el Service es responsable de llamar al commit.
+       
         
         return new_order
     

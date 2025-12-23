@@ -26,10 +26,10 @@ POST {{base_url}}/auth/register
 Content-Type: application/json
 
 {
-  "name": "Usuario Demo",
-  "username": "demo_user",
-  "email": "demo@example.com",
-  "password": "clave_segura",
+  "name": "Alex Cruz",
+  "username": "alex",
+  "email": "alexbleiz4335@gmail.com",
+  "password": "123456789",
   "role": "admin"
 }
 

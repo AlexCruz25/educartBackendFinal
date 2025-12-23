@@ -7,9 +7,6 @@ from app.core.security import get_db, get_current_user
 from app.schemas.cart import CartResponse, CartItemCreate, CartItemUpdate
 from app.services.cart_service import CartService 
 
-
-# Eliminamos {user_id} del prefijo. Todas las rutas requieren autenticación.
-
 cart_router = APIRouter(
     prefix="/cart", 
     tags=["Cart"],

@@ -14,10 +14,9 @@ class Product(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     image_url = Column(String(500))
     
-    sku = Column(String(50), nullable=False, unique=True, index=True) # Identificador único [cite: 250]
-    stock_current = Column(Integer, default=0, nullable=False) # Cantidad física [cite: 251]
-    stock_min = Column(Integer, default=10, nullable=False) # Punto de reorden [cite: 252]
-    
+    sku = Column(String(50), nullable=False, unique=True, index=True) 
+    stock_current = Column(Integer, default=0, nullable=False) 
+    stock_min = Column(Integer, default=10, nullable=False) 
     __table_args__ = (
         CheckConstraint('stock_current >= 0', name='check_stock_non_negative'),
     )
